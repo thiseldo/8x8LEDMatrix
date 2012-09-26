@@ -12,32 +12,22 @@
 
 #include <FrequencyTimer2.h>
 #include "font5x7.h"
-String inputString = "";
-boolean stringComplete = false;  // whether the string is complete
 
 #define DELAY 80
 
-#define MAX_MSG 100
-
-char msgBuf[MAX_MSG];
-char testMessage[] = "My Sex is on fire!!!";
-
-char *msgPtr;
+char message[] = "My Sex is on fire!!!";
 
 byte col = 0;
 byte leds[8][8];
 
 // pin[xx] on led matrix connected to nn on Arduino (-1 is dummy to make array start at pos 1)
-//int pins[17]= {-1, 5, 4, 3, 2, 14, 15, 16, 17, 13, 12, 11, 10, 9, 8, 7, 6};
 int pins[17]= {
   -1, 17, 8, 7, 19, 9, 13, 4, 10, 6, 5, 18, 3, 2, 11, 12, 16};
-//int pins[17]= {-1, 13, 12, 11, 10, 16, 17, 18, 19, 2, 3, 4, 5, 6, 7, 8, 9};
 
 // col[xx] of leds = pin yy on led matrix
 int cols[8] = {
   pins[13], pins[3], pins[4], pins[10], pins[06], pins[11], pins[15], pins[16]};
 
-// row[xx] of leds = pin yy on led matrix
 int rows[8] = {
   pins[9], pins[14], pins[8], pins[12], pins[1], pins[7], pins[2], pins[5]};
 
@@ -66,19 +56,6 @@ void setup() {
   // Set interrupt routine to be called
   FrequencyTimer2::setOnOverflow(display);
 
-  //  Serial.begin(19200);
-  /*  for( int i=' '; i<='z'; i++ ) {
-   //    Serial.println(i, DEC);
-   setChar( i );
-   delay(100);
-   }
-   */
-  Serial.begin(9600);
-   inputString.reserve(200);
-   
-   strcpy(msgBuf, testMessage);
-   stringComplete = true;
-
 }
 
 void scrollMsg( char *msg ) {
@@ -95,19 +72,7 @@ void scrollMsg( char *msg ) {
 
 
 void loop() {
-    // print the string when a newline arrives:
-  if (stringComplete) {
-    Serial.println(inputString); 
-    Serial.println();
-    // clear the string:
-    inputString = "";
-    stringComplete = false;
-    scrollMsg(msgBuf);
-  }
-//  scrollMsg( testMessage );
-  //    pattern = ++pattern % numPatterns;
-  //    slidePattern(pattern, 60);
-  //  delay(1000);
+  scrollMsg( message );
 }
 
 void clearLeds() {
@@ -175,29 +140,5 @@ void display() {
     }
   }
   digitalWrite(cols[col], HIGH); // Turn whole column on at once (for equal lighting times)
-}
-
-/*
-  SerialEvent occurs whenever a new data comes in the
- hardware serial RX.  This routine is run between each
- time loop() runs, so using delay inside loop can delay
- response.  Multiple bytes of data may be available.
- */
-void serialEvent() {
-  while (Serial.available()) {
-    // get the new byte:
-    char inChar = (char)Serial.read(); 
-    // add it to the inputString:
-    inputString += inChar;
-    *msgPtr++ = inChar;
-    // if the incoming character is a newline, set a flag
-    // so the main loop can do something about it:
-    if( (inChar == '\n') || ( msgPtr >= (msgBuf + MAX_MSG - 1))) {
-      *msgPtr = '\0';
-      stringComplete = true;
-      msgPtr = msgBuf;
-
-    }
-  }
 }
 
